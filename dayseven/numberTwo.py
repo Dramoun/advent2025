@@ -11,38 +11,49 @@ def main(lst):
 
     beamList.add(startCol)
     
-    for row in lst[1:]:
-        beamList, added = updateBeamList(beamList, row)
-        
-        for en, char in enumerate(row):
-            if en in  beamList:
-                row = row[:en] + '|' + row[en + 1:]
+    updatedBeamList = []
 
-        print(row)
-        print(added)
-        total += added
+    for row in lst[1:]:
+        beamList, split = updateBeamList(beamList, row)
+        
+        if split > 0:
+            for en, char in enumerate(row):
+                if en in  beamList:
+                    row = row[:en] + '|' + row[en + 1:]
+            
+            rowDiffTotal = 0
+
+            print(row.strip())
+            print(split, beamList)
+        
+            total += split
 
     return total
 
 def updateBeamList(beamList, row):
     newBeamList = set()
-    added = 0
+    split = 0
 
     for beam in beamList:
         if row[beam] != '^':
             newBeamList.add(beam)
         else:
-            if beam - 1 >= 0 and beam - 1 not in newBeamList and beam - 1 not in beamList:
+            left = beam - 1
+            right = beam + 1
+
+            if left not in beamList:
                 #print('adding ', beam - 1, 'to', newBeamList)
                 newBeamList.add(beam - 1)
-            if beam + 1 <= len(row) - 1 and beam + 1 not in newBeamList and beam + 1 not in beamList:
+                split += 1 
+            
+            if right not in beamList:
                 #print('adding ', beam + 1, 'to', newBeamList)
                 newBeamList.add(beam + 1)
-            added += 1 
-    
-    return newBeamList, added
+                split += 1 
+                
+    return newBeamList, split
 
 if __name__ == "__main__":
-    lst = readFile("./file.txt")
+    lst = readFile("./test.txt")
     result = main(lst)
     print(result)
